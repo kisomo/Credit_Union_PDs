@@ -37,22 +37,60 @@ raw_df['label'] = raw_df['Number of Days Delinquent'].map(lambda x : 1 if int(x)
 
 print(raw_df.shape)
 
+#print(raw_df['Loan Type Description'].mean())
+print(np.any(np.isnan(raw_df['Loan Type Description'])))
+#print(raw_df['Balance'].mean())
+print(np.any(np.isnan(raw_df['Balance'])))
+#print(raw_df['Loan Term'].mean())
+print(np.any(np.isnan(raw_df['Loan Term'])))
+#print(raw_df['LTV'].mean())
+print(np.any(np.isnan(raw_df['LTV'])))
+#print(raw_df['label'].sum())
+print(np.any(np.isnan(raw_df['label'])))
 
-df1 = pd.concat([raw_df['Loan Type Description'], raw_df['Balance'], raw_df['Loan Term'],raw_df['LTV'], raw_df['label']],axis =1)
-print(df1.shape)
+print("\n\n")
+
+#print(raw_df['Interest Rate'].mean())
+print(np.any(np.isnan(raw_df['Interest Rate'])))
+#print(raw_df['Origination Month'].mean())
+print(np.any(np.isnan(raw_df['Origination Month'])))
+#print(raw_df['Most Recent Credit Score'].mean())
+print(np.any(np.isnan(raw_df['Most Recent Credit Score'])))
+#print(raw_df['AmountFunded'].mean())
+raw_df['AmountFunded'] = raw_df['AmountFunded'].fillna(-99999)
+print(np.any(np.isnan(raw_df['AmountFunded'])))
+#print(raw_df['MonthlyIncomeBaseSalary'].mean())
+raw_df['MonthlyIncomeBaseSalary'] = raw_df['MonthlyIncomeBaseSalary'].fillna(-99999)
+print(np.any(np.isnan(raw_df['MonthlyIncomeBaseSalary'])))
+#print(raw_df['TotalMonthlyIncome'].mean())
+raw_df['TotalMonthlyIncome'] = raw_df['TotalMonthlyIncome'].fillna(-99999)
+print(np.any(np.isnan(raw_df['TotalMonthlyIncome'])))
+#print(raw_df['MonthlyIncomeOther'].mean())
+raw_df['MonthlyIncomeOther'] = raw_df['MonthlyIncomeOther'].fillna(-99999)
+print(np.any(np.isnan(raw_df['MonthlyIncomeOther'])))
+#print(raw_df['Collateral Current Valuation'].mean())
+print(np.any(np.isnan(raw_df['Collateral Current Valuation'])))
 
 
-'''
+#raw_df.fillna(-99999)
+
+#df1 = pd.concat([raw_df['Loan Type Description'], raw_df['Balance'], raw_df['Loan Term'],raw_df['LTV'], raw_df['label']],axis =1)
+#print(df1.shape)
+
 df1 = pd.concat([raw_df['Loan Type Description'], raw_df['Balance'], raw_df['Loan Term'],raw_df['Interest Rate'],
 raw_df['Origination Month'],raw_df['Most Recent Credit Score'],
 raw_df['AmountFunded'],raw_df['MonthlyIncomeBaseSalary'],raw_df['TotalMonthlyIncome'],raw_df['MonthlyIncomeOther'],
 raw_df['Collateral Current Valuation'],raw_df['LTV'], raw_df['label']],axis = 1)
 print(df1.shape)
-'''
 
-print(df1.head(9))
+print(df1.head(4))
 
-#df = df.set_index("Unnamed: 0")
+#df1 = df1.reset_index()
+
+print(np.any(np.isnan(df1)))
+print(np.all(np.isfinite(df1)))
+
+y_CU = raw_df['Probability of Default']
 y = df1.label
 X = df1.drop("label", axis =1)
 
@@ -61,8 +99,7 @@ print(X.shape)
 #from sklearn.cross_validation import train_test_split
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import confusion_matrix
-from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
-
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, auc, roc_curve
 
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=0)
@@ -85,6 +122,8 @@ acc = accuracy_score(y_test,y_pred)
 prec = precision_score(y_test,y_pred)
 rec = recall_score(y_test,y_pred)
 f1 = f1_score(y_test, y_pred)
+fpr, tpr, thresholds = roc_curve(y_test, y_pred)
+auc = auc(fpr,tpr)
 
 print("\n\n")
 
@@ -92,14 +131,19 @@ print("Number of mislabeled points out of a total %d points : %d" % (X_test.shap
 
 print("\n\n")
 
-print("Logistic" ,acc, prec,rec, f1)
-
+print("Logistic accuracy:" ,acc)
+print("Logistic precision:" ,prec)
+print("Logistic recall:" ,rec)
+print("Logistic f1 ratio:" ,f1)
+print("Logistic AUC:" ,auc)
 
 y_proba_lr = lr.fit(X_train, y_train).predict_proba(X_test)
-#y_proba_list = list(zip(y_test[0:20], y_proba_lr[0:20,1]))
+print(y_proba_lr[:,1])
+#print(y_CU - y_proba_lr[:,1])
+#print(y_CU)
 
+#y_proba_list = list(zip(y_test[0:20], y_proba_lr[0:20,1]))
 # show the probability of positive class for first 20 instances
-print(y_proba_lr)
 #print(y_proba_list)
 
 
