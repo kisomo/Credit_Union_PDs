@@ -1,5 +1,8 @@
 import numpy as np
 import pandas as pd
+import itertools
+import matplotlib.pyplot as plt
+
 
 
 raw_df = pd.read_csv("/home/terrence/CODING/Python/MODELS/Credit_Union_PDs/default_data.csv", encoding="latin-1")
@@ -96,6 +99,22 @@ X = df1.drop("label", axis =1)
 
 print(X.shape)
 
+RANDOM_SEED = 42
+LABELS = ["non-deli", "deli"]
+
+print(df1.shape)
+print(df1.isnull().values.any())
+print(df1.head(3))
+
+count_classes = pd.value_counts(df1['label'], sort = True)
+count_classes.plot(kind = 'bar', rot=0)
+plt.title("delinguency distribution")
+plt.xticks(range(2), LABELS)
+plt.xlabel("Class")
+plt.ylabel("Frequency")
+plt.show()
+
+
 #from sklearn.cross_validation import train_test_split
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import confusion_matrix
@@ -147,6 +166,72 @@ print(y_proba_lr[:,1])
 #print(y_proba_list)
 
 
+from sklearn.model_selection import cross_val_score
+
+# accuracy is the default scoring metric
+print('Cross-validation (accuracy)', cross_val_score(lr, X, y, cv=5))
+# use AUC as scoring metric
+print('Cross-validation (AUC)', cross_val_score(lr, X, y, cv=5, scoring = 'roc_auc'))
+# use recall as scoring metric
+print('Cross-validation (recall)', cross_val_score(lr, X, y, cv=5, scoring = 'recall'))
+print('Cross-validation (precision)', cross_val_score(lr, X, y, cv=5, scoring = 'precision'))
+
+
+import seaborn as sns   
+
+#cm = pd.crosstab(y_test, y_pred, rownames = 'True', colnames = 'predicted', margins = False)
+cm = confusion_matrix(y_test, lr_predicted)
+
+ax= plt.subplot()
+sns.heatmap(cm, annot=True, ax = ax); #annot=True to annotate cells
+
+# labels, title and ticks
+ax.set_xlabel('Predicted labels');ax.set_ylabel('True labels'); 
+ax.set_title('Confusion Matrix'); 
+ax.xaxis.set_ticklabels(['non-deli', 'deli']); ax.yaxis.set_ticklabels(['non-deli', 'deli'])
+plt.show()
+
+
+y_scores_lr = lr.decision_function(X_test)
+
+# ### Precision-recall curves
+
+from sklearn.metrics import precision_recall_curve
+
+precision, recall, thresholds = precision_recall_curve(y_test, y_scores_lr)
+closest_zero = np.argmin(np.abs(thresholds))
+closest_zero_p = precision[closest_zero]
+closest_zero_r = recall[closest_zero]
+
+plt.figure()
+plt.xlim([0.0, 1.01])
+plt.ylim([0.0, 1.01])
+plt.plot(precision, recall, label='Precision-Recall Curve')
+plt.plot(closest_zero_p, closest_zero_r, 'o', markersize = 12, fillstyle = 'none', c='r', mew=3)
+plt.xlabel('Precision', fontsize=16)
+plt.ylabel('Recall', fontsize=16)
+plt.axes().set_aspect('equal')
+plt.show()
+
+
+'''
+
+fpr_lr, tpr_lr, _ = roc_curve(y_test, y_scores_lr)
+roc_auc_lr = auc(fpr_lr, tpr_lr)
+
+plt.figure()
+plt.xlim([-0.01, 1.00])
+plt.ylim([-0.01, 1.01])
+plt.plot(fpr_lr, tpr_lr, lw=3, label='LogRegr ROC curve (area = {:0.2f})'.format(roc_auc_lr))
+plt.xlabel('False Positive Rate', fontsize=16)
+plt.ylabel('True Positive Rate', fontsize=16)
+plt.title('ROC curve (1-of-10 digits classifier)', fontsize=16)
+plt.legend(loc='lower right', fontsize=13)
+plt.plot([0, 1], [0, 1], color='navy', lw=3, linestyle='--')
+plt.axes().set_aspect('equal')
+plt.show()
+
+'''
 
 
 
