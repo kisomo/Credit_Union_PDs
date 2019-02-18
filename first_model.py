@@ -6,8 +6,6 @@ import matplotlib.pyplot as plt
 
 
 raw_df = pd.read_csv("/home/terrence/CODING/Python/MODELS/Credit_Union_PDs/default_data.csv", encoding="latin-1")
-#file_name = "/home/terrence/CODING/Python/MODELS/CREDIT_UNION_PDS/default_data.csv"
-#raw_df = pd.read_excel(file_name, sheet_name='Data')
 print(raw_df.shape)
 #raw_df.dropna(inplace = True)
 #print(raw_df.shape)
@@ -73,23 +71,41 @@ raw_df['MonthlyIncomeOther'] = raw_df['MonthlyIncomeOther'].fillna(-99999)
 print(np.any(np.isnan(raw_df['MonthlyIncomeOther'])))
 #print(raw_df['Collateral Current Valuation'].mean())
 print(np.any(np.isnan(raw_df['Collateral Current Valuation'])))
-
-
+print("\n\n")
+#raw_df['Balance'] = raw_df['Balance'].fillna(-99999)
+print(np.any(np.isnan(raw_df['Balance'])))
+#raw_df['Grade Overall'] = raw_df['Grade Overall'].fillna(-99999)
+print(np.any(np.isnan(raw_df['Grade Overall'])))
+#raw_df['Current Credit Limit'] = raw_df['Current Credit Limit'].fillna(-99999)
+print(np.any(np.isnan(raw_df['Current Credit Limit'])))
+#raw_df['Loan Type Code'] = raw_df['Loan Type Code'].fillna(-99999)
+print(np.any(np.isnan(raw_df['Loan Type Code'])))
+#raw_df['Status'] = raw_df['Status'].fillna(-99999)
+print(np.any(np.isnan(raw_df['Status'])))
+raw_df['Insurance'] = raw_df['Insurance'].fillna(-99999)
+print(np.any(np.isnan(raw_df['Insurance'])))
+raw_df['NumberOfOpenRevolvingAccounts'] = raw_df['NumberOfOpenRevolvingAccounts'].fillna(-99999)
+print(np.any(np.isnan(raw_df['NumberOfOpenRevolvingAccounts'])))
+raw_df['APR'] = raw_df['APR'].fillna(-99999)
+print(np.any(np.isnan(raw_df['APR'])))
 #raw_df.fillna(-99999)
 
 #df1 = pd.concat([raw_df['Loan Type Description'], raw_df['Balance'], raw_df['Loan Term'],raw_df['LTV'], raw_df['label']],axis =1)
 #print(df1.shape)
 
 df1 = pd.concat([raw_df['Loan Type Description'], raw_df['Balance'], raw_df['Loan Term'],raw_df['Interest Rate'],
-raw_df['Origination Month'],raw_df['Most Recent Credit Score'],
-raw_df['AmountFunded'],raw_df['MonthlyIncomeBaseSalary'],raw_df['TotalMonthlyIncome'],raw_df['MonthlyIncomeOther'],
-raw_df['Collateral Current Valuation'],raw_df['LTV'], raw_df['label']],axis = 1)
+raw_df['Origination Month'],raw_df['Most Recent Credit Score'],raw_df['AmountFunded'],raw_df['MonthlyIncomeBaseSalary'],
+raw_df['TotalMonthlyIncome'],raw_df['MonthlyIncomeOther'],raw_df['Collateral Current Valuation'],raw_df['LTV'], 
+
+raw_df['Balance'],raw_df['Grade Overall'],raw_df['Current Credit Limit'],raw_df['Loan Type Code'],raw_df['Status'],
+raw_df['Insurance'],raw_df['NumberOfOpenRevolvingAccounts'],raw_df['APR'],
+raw_df['label']],axis = 1)
 print(df1.shape)
 
 print(df1.head(4))
 
-#df1 = df1.reset_index()
 
+#df1 = df1.reset_index()
 print(np.any(np.isnan(df1)))
 print(np.all(np.isfinite(df1)))
 
@@ -131,6 +147,7 @@ lr_predicted = lr.predict(X_test)
 confusion = confusion_matrix(y_test, lr_predicted)
 print(lr.score(X_test,y_test))
 print("Number of mislabeled points out of a total %d points : %d" % (X_test.shape[0],(y_test != lr_predicted).sum()))
+
 
 print("\n\n")
 
@@ -214,8 +231,8 @@ plt.axes().set_aspect('equal')
 plt.show()
 
 
-'''
 
+'''
 fpr_lr, tpr_lr, _ = roc_curve(y_test, y_scores_lr)
 roc_auc_lr = auc(fpr_lr, tpr_lr)
 
@@ -230,8 +247,8 @@ plt.legend(loc='lower right', fontsize=13)
 plt.plot([0, 1], [0, 1], color='navy', lw=3, linestyle='--')
 plt.axes().set_aspect('equal')
 plt.show()
-
 '''
+
 
 
 
