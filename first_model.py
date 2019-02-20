@@ -173,7 +173,8 @@ print("Logistic recall:" ,rec)
 print("Logistic f1 ratio:" ,f1)
 print("Logistic AUC:" ,auc)
 
-y_proba_lr = lr.fit(X_train, y_train).predict_proba(X_test)
+#y_proba_lr = lr.fit(X_train, y_train).predict_proba(X_test)
+y_proba_lr = lr.fit(X_train, y_train).predict_proba(X)
 print(y_proba_lr[:,1])
 #print(y_CU - y_proba_lr[:,1])
 #print(y_CU)
@@ -248,6 +249,11 @@ plt.plot([0, 1], [0, 1], color='navy', lw=3, linestyle='--')
 plt.axes().set_aspect('equal')
 plt.show()
 '''
+
+print(y_proba_lr[:,1])
+err = y_CU - y_proba_lr[:,1]
+rmse_err = np.sqrt(np.mean(err**2))
+print(rmse_err)
 
 
 
