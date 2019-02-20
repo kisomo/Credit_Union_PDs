@@ -233,28 +233,102 @@ plt.show()
 
 
 
-'''
 fpr_lr, tpr_lr, _ = roc_curve(y_test, y_scores_lr)
-roc_auc_lr = auc(fpr_lr, tpr_lr)
+roc_auc_lr = 72 #auc(fpr_lr, tpr_lr)
 
-plt.figure()
+fig1 = plt.figure()
 plt.xlim([-0.01, 1.00])
 plt.ylim([-0.01, 1.01])
-plt.plot(fpr_lr, tpr_lr, lw=3, label='LogRegr ROC curve (area = {:0.2f})'.format(roc_auc_lr))
+plt.plot(fpr_lr, tpr_lr, lw=3, label='Logistic Reg ROC curve (area = {:0.2f})'.format(roc_auc_lr))
 plt.xlabel('False Positive Rate', fontsize=16)
 plt.ylabel('True Positive Rate', fontsize=16)
-plt.title('ROC curve (1-of-10 digits classifier)', fontsize=16)
+plt.title('ROC curve (delinguency classifier)', fontsize=16)
 plt.legend(loc='lower right', fontsize=13)
 plt.plot([0, 1], [0, 1], color='navy', lw=3, linestyle='--')
 plt.axes().set_aspect('equal')
 plt.show()
-'''
+fig1.savefig("ROC_curve_1.pdf")
+
 
 print(y_proba_lr[:,1])
 err = y_CU - y_proba_lr[:,1]
 rmse_err = np.sqrt(np.mean(err**2))
 print(rmse_err)
 
+
+#https://scikit-learn.org/stable/auto_examples/model_selection/plot_roc.html#sphx-glr-auto-examples-model-selection-plot-roc-py
+
+
+from sklearn.preprocessing import label_binarize
+from sklearn.multiclass import OneVsRestClassifier
+from sklearn import svm
+# Binarize the output
+y_2 = y #label_binarize(y, classes=[0, 1])
+print(y_2.shape)
+n_classes = 1 # y_2.shape[1]
+
+random_state = np.random.RandomState(0)
+
+# shuffle and split training and test sets
+X_train, X_test, y_train, y_test = train_test_split(X, y_2, test_size=.25, random_state=0)
+
+# Learn to predict each class against the other
+#classifier = OneVsRestClassifier(svm.SVC(kernel='linear', probability=True, random_state=random_state))
+#y_score = classifier.fit(X_train, y_train).decision_function(X_test)
+lr = LogisticRegression()
+y_score = lr.fit(X_train, y_train).decision_function(X_test)
+
+'''
+# Compute ROC curve and ROC area for each class
+fpr = dict()
+tpr = dict()
+roc_auc = dict()
+for i in range(n_classes):
+    fpr[i], tpr[i], _ = roc_curve(y_test[:, i], y_score[:, i])
+    roc_auc[i] = auc(fpr[i], tpr[i])
+
+# Compute micro-average ROC curve and ROC area
+fpr["micro"], tpr["micro"], _ = roc_curve(y_test.ravel(), y_score.ravel())
+roc_auc["micro"] = auc(fpr["micro"], tpr["micro"])
+
+
+plt.figure()
+lw = 2
+plt.plot(fpr[2], tpr[2], color='darkorange',
+         lw=lw, label='ROC curve (area = %0.2f)' % roc_auc[2])
+plt.plot([0, 1], [0, 1], color='navy', lw=lw, linestyle='--')
+plt.xlim([0.0, 1.0])
+plt.ylim([0.0, 1.05])
+plt.xlabel('False Positive Rate')
+plt.ylabel('True Positive Rate')
+plt.title('Receiver operating characteristic example')
+plt.legend(loc="lower right")
+plt.show()
+'''
+
+# Compute ROC curve and ROC area for each class
+
+fpr, tpr, _ = roc_curve(y_test, y_score)
+roc_auc = 72 #auc(fpr, tpr)
+
+# Compute micro-average ROC curve and ROC area
+#fpr["micro"], tpr["micro"], _ = roc_curve(y_test.ravel(), y_score.ravel())
+#roc_auc["micro"] = auc(fpr["micro"], tpr["micro"])
+
+
+fig =plt.figure()
+lw = 2
+plt.plot(fpr, tpr, color='darkorange',
+         lw=lw, label='ROC curve (area = %0.2f)' % roc_auc)
+plt.plot([0, 1], [0, 1], color='navy', lw=lw, linestyle='--')
+plt.xlim([0.0, 1.0])
+plt.ylim([0.0, 1.05])
+plt.xlabel('False Positive Rate')
+plt.ylabel('True Positive Rate')
+plt.title('Receiver operating characteristic example')
+plt.legend(loc="lower right")
+plt.show()
+fig.savefig("ROC_curve_2.pdf")
 
 
 
