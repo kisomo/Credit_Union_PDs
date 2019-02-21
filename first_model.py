@@ -157,6 +157,9 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=0)
 from sklearn.linear_model import LogisticRegression
 lr = LogisticRegression()
 lr = lr.fit(X_train, y_train)
+
+params = np.append(lr.intercept_,lr.coef_)
+print(params)
 lr_predicted = lr.predict(X_test)
 confusion = confusion_matrix(y_test, lr_predicted)
 print(lr.score(X_test,y_test))
