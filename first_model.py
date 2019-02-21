@@ -5,7 +5,9 @@ import matplotlib.pyplot as plt
 
 
 
-raw_df = pd.read_csv("/home/terrence/CODING/Python/MODELS/Credit_Union_PDs/default_data.csv", encoding="latin-1")
+#raw_df = pd.read_csv("/home/terrence/CODING/Python/MODELS/Credit_Union_PDs/default_data.csv", encoding="latin-1")
+myfile = "/home/terrence/CODING/Python/MODELS/Credit_Union_PDs/Test Variables READY.xlsx"
+raw_df = pd.read_excel(myfile, sheetname = 'Data', header = 0)
 print(raw_df.shape)
 #raw_df.dropna(inplace = True)
 #print(raw_df.shape)
@@ -58,16 +60,16 @@ print(np.any(np.isnan(raw_df['Origination Month'])))
 #print(raw_df['Most Recent Credit Score'].mean())
 print(np.any(np.isnan(raw_df['Most Recent Credit Score'])))
 #print(raw_df['AmountFunded'].mean())
-raw_df['AmountFunded'] = raw_df['AmountFunded'].fillna(-99999)
+raw_df['AmountFunded'] = raw_df['AmountFunded'].fillna(raw_df['AmountFunded'].mean())
 print(np.any(np.isnan(raw_df['AmountFunded'])))
 #print(raw_df['MonthlyIncomeBaseSalary'].mean())
-raw_df['MonthlyIncomeBaseSalary'] = raw_df['MonthlyIncomeBaseSalary'].fillna(-99999)
+raw_df['MonthlyIncomeBaseSalary'] = raw_df['MonthlyIncomeBaseSalary'].fillna(raw_df['MonthlyIncomeBaseSalary'].mean())
 print(np.any(np.isnan(raw_df['MonthlyIncomeBaseSalary'])))
 #print(raw_df['TotalMonthlyIncome'].mean())
-raw_df['TotalMonthlyIncome'] = raw_df['TotalMonthlyIncome'].fillna(-99999)
+raw_df['TotalMonthlyIncome'] = raw_df['TotalMonthlyIncome'].fillna(raw_df['TotalMonthlyIncome'].mean())
 print(np.any(np.isnan(raw_df['TotalMonthlyIncome'])))
 #print(raw_df['MonthlyIncomeOther'].mean())
-raw_df['MonthlyIncomeOther'] = raw_df['MonthlyIncomeOther'].fillna(-99999)
+raw_df['MonthlyIncomeOther'] = raw_df['MonthlyIncomeOther'].fillna(raw_df['MonthlyIncomeOther'].mean())
 print(np.any(np.isnan(raw_df['MonthlyIncomeOther'])))
 #print(raw_df['Collateral Current Valuation'].mean())
 print(np.any(np.isnan(raw_df['Collateral Current Valuation'])))
@@ -82,32 +84,44 @@ print(np.any(np.isnan(raw_df['Current Credit Limit'])))
 print(np.any(np.isnan(raw_df['Loan Type Code'])))
 #raw_df['Status'] = raw_df['Status'].fillna(-99999)
 print(np.any(np.isnan(raw_df['Status'])))
-raw_df['Insurance'] = raw_df['Insurance'].fillna(-99999)
+raw_df['Insurance'] = raw_df['Insurance'].fillna(raw_df['Insurance'].mean())
 print(np.any(np.isnan(raw_df['Insurance'])))
-raw_df['NumberOfOpenRevolvingAccounts'] = raw_df['NumberOfOpenRevolvingAccounts'].fillna(-99999)
+raw_df['NumberOfOpenRevolvingAccounts'] = raw_df['NumberOfOpenRevolvingAccounts'].fillna(raw_df['NumberOfOpenRevolvingAccounts'].mean())
 print(np.any(np.isnan(raw_df['NumberOfOpenRevolvingAccounts'])))
-raw_df['APR'] = raw_df['APR'].fillna(-99999)
+raw_df['APR'] = raw_df['APR'].fillna(raw_df['APR'].mean())
 print(np.any(np.isnan(raw_df['APR'])))
-#raw_df.fillna(-99999)
+
+#raw_df['PaymentToIncome'] = raw_df['PaymentToIncome'].fillna(raw_df['PaymentToIncome'].mean())
+#print(np.any(np.isnan(raw_df['PaymentToIncome'])))
+
+raw_df['AmountOwedToLender'] = raw_df['AmountOwedToLender'].fillna(raw_df['AmountOwedToLender'].mean())
+print(np.any(np.isnan(raw_df['AmountOwedToLender'])))
+
+#raw_df['AGE of BORROWER'] = raw_df['AGE of BORROWER'].fillna(raw_df['AGE of BORROWER'].mean())
+#print(np.any(np.isnan(raw_df['AGE of BORROWER'])))
+
+raw_df['LoanPaymentFrequency'] = raw_df['LoanPaymentFrequency'].fillna(raw_df['LoanPaymentFrequency'].mean())
+print(np.any(np.isnan(raw_df['LoanPaymentFrequency'])))
+
+raw_df['Rate'] = raw_df['Rate'].fillna(raw_df['Rate'].mean())
+print(np.any(np.isnan(raw_df['Rate'])))
 
 #df1 = pd.concat([raw_df['Loan Type Description'], raw_df['Balance'], raw_df['Loan Term'],raw_df['LTV'], raw_df['label']],axis =1)
-#print(df1.shape)
 
-df1 = pd.concat([raw_df['Loan Type Description'], raw_df['Balance'], raw_df['Loan Term'],raw_df['Interest Rate'],
-raw_df['Origination Month'],raw_df['Most Recent Credit Score'],raw_df['AmountFunded'],raw_df['MonthlyIncomeBaseSalary'],
-raw_df['TotalMonthlyIncome'],raw_df['MonthlyIncomeOther'],raw_df['Collateral Current Valuation'],raw_df['LTV'], 
+df1 = raw_df[['Loan Type Description','Balance','Loan Term','Interest Rate','Origination Month','Most Recent Credit Score',
+'AmountFunded','MonthlyIncomeBaseSalary', 'TotalMonthlyIncome','MonthlyIncomeOther','Collateral Current Valuation','LTV', 
+'Balance','Grade Overall','Current Credit Limit','Loan Type Code','Loan Category','Status','Updated Credit Score',
+'Original Interest Rate','Grade by Cerdit Score (ORIGINAL)','GRADE BY CREDIT SCORE (UPDATED)','Insurance',
+'NumberOfOpenRevolvingAccounts','AmountOwedToLender','APR','LoanPaymentFrequency','Rate','label']]
 
-raw_df['Balance'],raw_df['Grade Overall'],raw_df['Current Credit Limit'],raw_df['Loan Type Code'],raw_df['Status'],
-raw_df['Insurance'],raw_df['NumberOfOpenRevolvingAccounts'],raw_df['APR'],
-raw_df['label']],axis = 1)
 print(df1.shape)
 
 print(df1.head(4))
 
 
 #df1 = df1.reset_index()
-print(np.any(np.isnan(df1)))
-print(np.all(np.isfinite(df1)))
+#print(np.any(np.isnan(df1)))
+#print(np.all(np.isfinite(df1)))
 
 y_CU = raw_df['Probability of Default']
 y = df1.label
@@ -116,7 +130,7 @@ X = df1.drop("label", axis =1)
 print(X.shape)
 
 RANDOM_SEED = 42
-LABELS = ["non-deli", "deli"]
+LABELS = ["non-delinguent", "delinguent"]
 
 print(df1.shape)
 print(df1.isnull().values.any())
@@ -278,43 +292,11 @@ X_train, X_test, y_train, y_test = train_test_split(X, y_2, test_size=.25, rando
 lr = LogisticRegression()
 y_score = lr.fit(X_train, y_train).decision_function(X_test)
 
-'''
-# Compute ROC curve and ROC area for each class
-fpr = dict()
-tpr = dict()
-roc_auc = dict()
-for i in range(n_classes):
-    fpr[i], tpr[i], _ = roc_curve(y_test[:, i], y_score[:, i])
-    roc_auc[i] = auc(fpr[i], tpr[i])
-
-# Compute micro-average ROC curve and ROC area
-fpr["micro"], tpr["micro"], _ = roc_curve(y_test.ravel(), y_score.ravel())
-roc_auc["micro"] = auc(fpr["micro"], tpr["micro"])
-
-
-plt.figure()
-lw = 2
-plt.plot(fpr[2], tpr[2], color='darkorange',
-         lw=lw, label='ROC curve (area = %0.2f)' % roc_auc[2])
-plt.plot([0, 1], [0, 1], color='navy', lw=lw, linestyle='--')
-plt.xlim([0.0, 1.0])
-plt.ylim([0.0, 1.05])
-plt.xlabel('False Positive Rate')
-plt.ylabel('True Positive Rate')
-plt.title('Receiver operating characteristic example')
-plt.legend(loc="lower right")
-plt.show()
-'''
 
 # Compute ROC curve and ROC area for each class
 
 fpr, tpr, _ = roc_curve(y_test, y_score)
 roc_auc = 72 #auc(fpr, tpr)
-
-# Compute micro-average ROC curve and ROC area
-#fpr["micro"], tpr["micro"], _ = roc_curve(y_test.ravel(), y_score.ravel())
-#roc_auc["micro"] = auc(fpr["micro"], tpr["micro"])
-
 
 fig =plt.figure()
 lw = 2
@@ -329,7 +311,6 @@ plt.title('Receiver operating characteristic example')
 plt.legend(loc="lower right")
 plt.show()
 fig.savefig("ROC_curve_2.pdf")
-
 
 
 
