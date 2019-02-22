@@ -146,6 +146,7 @@ plt.xlabel("Class")
 plt.ylabel("Frequency")
 plt.show()
 plt.savefig("Class distribution.pdf")
+plt.savefig("Class distribution.png")
 
 print(df1['label'].value_counts())
 
@@ -205,7 +206,7 @@ ax1.legend(loc='lower left')
 ax2.legend(loc='lower left')
 plt.show()
 plt.savefig("log_reg_weights.pdf")
-
+plt.savefig("log_reg_weights.png")
 
 #lr = LogisticRegression(class_weight='balanced')
 lr = LogisticRegression(class_weight={0:1,1:28})
@@ -292,6 +293,7 @@ ax.set_title('Confusion Matrix');
 ax.xaxis.set_ticklabels(['non-delinguent', 'delinguent']); ax.yaxis.set_ticklabels(['non-delinguent', 'delinguent'])
 plt.show()
 plt.savefig("confusion_matrix.pdf")
+plt.savefig("confusion_matrix.png")
 
 y_scores_lr = lr.decision_function(X_test)
 
@@ -331,6 +333,7 @@ plt.plot([0, 1], [0, 1], color='navy', lw=3, linestyle='--')
 plt.axes().set_aspect('equal')
 plt.show()
 fig1.savefig("ROC_curve_1.pdf")
+fig1.savefig("ROC_curve_1.png")
 
 
 print(y_proba_lr[:,1])
@@ -402,7 +405,7 @@ plt.title('Receiver operating characteristic example')
 plt.legend(loc="lower right")
 plt.show()
 fig.savefig("ROC_curve_2.pdf")
-
+fig.savefig("ROC_curve_2.png")
 '''
 
 
