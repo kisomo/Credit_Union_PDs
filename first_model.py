@@ -138,6 +138,7 @@ print(df1.shape)
 print(df1.isnull().values.any())
 print(df1.head(3))
 
+fig11 = plt.figure()
 count_classes = pd.value_counts(df1['label'], sort = True)
 count_classes.plot(kind = 'bar', rot=0)
 plt.title("delinguency distribution")
@@ -145,8 +146,8 @@ plt.xticks(range(2), LABELS)
 plt.xlabel("Class")
 plt.ylabel("Frequency")
 plt.show()
-plt.savefig("Class distribution.pdf")
-plt.savefig("Class distribution.png")
+fig11.savefig("Class distribution.pdf")
+#fig11.savefig("Class distribution.png")
 
 print(df1['label'].value_counts())
 
@@ -176,15 +177,15 @@ print("Proportion of delinguent data in oversampled data is ",len(os_data_y[os_d
 
 from sklearn.linear_model import LogisticRegression
 
-fig = plt.figure(figsize=(15,8))
-ax1 = fig.add_subplot(1,2,1)
+fig12 = plt.figure(figsize=(15,8))
+ax1 = fig12.add_subplot(1,2,1)
 ax1.set_xlim([-0.05,1.05])
 ax1.set_ylim([-0.05,1.05])
 ax1.set_xlabel('Recall')
 ax1.set_ylabel('Precision')
 ax1.set_title('PR Curve')
 
-ax2 = fig.add_subplot(1,2,2)
+ax2 = fig12.add_subplot(1,2,2)
 ax2.set_xlim([-0.05,1.05])
 ax2.set_ylim([-0.05,1.05])
 ax2.set_xlabel('False Positive Rate')
@@ -205,8 +206,8 @@ for w,k in zip([1,5,10,20,50,100,10000],'bgrcmykw'):
 ax1.legend(loc='lower left')    
 ax2.legend(loc='lower left')
 plt.show()
-plt.savefig("log_reg_weights.pdf")
-plt.savefig("log_reg_weights.png")
+fig12.savefig("log_reg_weights.pdf")
+#fig12.savefig("log_reg_weights.png")
 
 #lr = LogisticRegression(class_weight='balanced')
 lr = LogisticRegression(class_weight={0:1,1:28})
@@ -292,8 +293,8 @@ ax.set_xlabel('Predicted labels');ax.set_ylabel('True labels');
 ax.set_title('Confusion Matrix'); 
 ax.xaxis.set_ticklabels(['non-delinguent', 'delinguent']); ax.yaxis.set_ticklabels(['non-delinguent', 'delinguent'])
 plt.show()
-plt.savefig("confusion_matrix.pdf")
-plt.savefig("confusion_matrix.png")
+#ax.savefig("confusion_matrix.pdf")
+#ax.savefig("confusion_matrix.png")
 
 y_scores_lr = lr.decision_function(X_test)
 
@@ -321,7 +322,7 @@ plt.show()
 fpr_lr, tpr_lr, _ = roc_curve(y_test, y_scores_lr)
 roc_auc_lr = auc1 #auc(fpr_lr, tpr_lr)
 
-fig1 = plt.figure()
+fig13 = plt.figure()
 plt.xlim([-0.01, 1.00])
 plt.ylim([-0.01, 1.01])
 plt.plot(fpr_lr, tpr_lr, lw=3, label='Logistic Reg ROC curve (area = {:0.2f})'.format(roc_auc_lr))
@@ -332,8 +333,8 @@ plt.legend(loc='lower right', fontsize=13)
 plt.plot([0, 1], [0, 1], color='navy', lw=3, linestyle='--')
 plt.axes().set_aspect('equal')
 plt.show()
-fig1.savefig("ROC_curve_1.pdf")
-fig1.savefig("ROC_curve_1.png")
+fig13.savefig("ROC_curve_1.pdf")
+#fig1.savefig("ROC_curve_1.png")
 
 
 print(y_proba_lr[:,1])
@@ -362,8 +363,6 @@ classifier_f.close()
 '''
 
 
-'''
-
 #https://scikit-learn.org/stable/auto_examples/model_selection/plot_roc.html#sphx-glr-auto-examples-model-selection-plot-roc-py
 
 
@@ -383,16 +382,16 @@ X_train, X_test, y_train, y_test = train_test_split(X, y_2, test_size=.25, rando
 # Learn to predict each class against the other
 #classifier = OneVsRestClassifier(svm.SVC(kernel='linear', probability=True, random_state=random_state))
 #y_score = classifier.fit(X_train, y_train).decision_function(X_test)
-lr = LogisticRegression()
-y_score = lr.fit(X_train, y_train).decision_function(X_test)
-
+#lr = LogisticRegression()
+#y_score = lr.fit(X_train, y_train).decision_function(X_test)
+y_score = lr.decision_function(X_test)
 
 # Compute ROC curve and ROC area for each class
 
 fpr, tpr, _ = roc_curve(y_test, y_score)
 roc_auc = auc1 #auc(fpr, tpr)
 
-fig =plt.figure()
+fig14 =plt.figure()
 lw = 2
 plt.plot(fpr, tpr, color='darkorange',
          lw=lw, label='ROC curve (area = %0.2f)' % roc_auc)
@@ -401,12 +400,12 @@ plt.xlim([0.0, 1.0])
 plt.ylim([0.0, 1.05])
 plt.xlabel('False Positive Rate')
 plt.ylabel('True Positive Rate')
-plt.title('Receiver operating characteristic example')
+plt.title('Receiver operating characteristic (ROC) curve')
 plt.legend(loc="lower right")
 plt.show()
-fig.savefig("ROC_curve_2.pdf")
-fig.savefig("ROC_curve_2.png")
-'''
+fig14.savefig("ROC_curve_2.pdf")
+#fig.savefig("ROC_curve_2.png")
+
 
 
 
