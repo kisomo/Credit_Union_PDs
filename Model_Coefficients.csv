@@ -1,0 +1,30 @@
+,Coeffient,Variable
+0,0.221914093226,Intercept
+1,0.0181131066185,Loan Type Description
+2,9.26553913902e-08,Balance
+3,-0.00868906894641,Loan Term
+4,0.142236648577,Interest Rate
+5,-0.130623996725,Origination Month
+6,-0.00354622342008,Most Recent Credit Score
+7,-1.30395777193e-05,AmountFunded
+8,5.55352231521e-05,MonthlyIncomeBaseSalary
+9,-6.47297790419e-05,TotalMonthlyIncome
+10,-0.000120264560758,MonthlyIncomeOther
+11,-3.66394473874e-08,Collateral Current Valuation
+12,0.00435618857126,LTV
+13,9.26553913902e-08,Balance
+14,1.28172609908,Grade Overall
+15,8.43599931007e-05,Current Credit Limit
+16,-0.000955643565332,Loan Type Code
+17,0.221914093226,Loan Category
+18,-0.705605399385,Status
+19,0.00172550950216,Updated Credit Score
+20,0.3799740402,Original Interest Rate
+21,-0.228677347038,Grade by Cerdit Score (ORIGINAL)
+22,0.0814469147056,GRADE BY CREDIT SCORE (UPDATED)
+23,-0.0187334074668,Insurance
+24,0.0238490532797,NumberOfOpenRevolvingAccounts
+25,-7.9417404687e-06,AmountOwedToLender
+26,0.0125692390522,APR
+27,-0.388076956167,LoanPaymentFrequency
+28,0.00929654997179,Rate

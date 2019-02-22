@@ -3,11 +3,14 @@ import pandas as pd
 import itertools
 import matplotlib.pyplot as plt
 
+from sklearn.model_selection import cross_val_predict,cross_val_score,train_test_split
+from sklearn.metrics import classification_report,confusion_matrix,roc_curve,auc,precision_recall_curve,roc_curve
 
+import pickle
 
 #raw_df = pd.read_csv("/home/terrence/CODING/Python/MODELS/Credit_Union_PDs/default_data.csv", encoding="latin-1")
 myfile = "/home/terrence/CODING/Python/MODELS/Credit_Union_PDs/Test Variables READY.xlsx"
-raw_df = pd.read_excel(myfile, sheetname = 'Data', header = 0)
+raw_df = pd.read_excel(myfile, sheet_name = 'Data', header = 0)
 print(raw_df.shape)
 #raw_df.dropna(inplace = True)
 #print(raw_df.shape)
@@ -118,10 +121,9 @@ print(df1.shape)
 
 print(df1.head(4))
 
-
 #df1 = df1.reset_index()
-#print(np.any(np.isnan(df1)))
-#print(np.all(np.isfinite(df1)))
+print(np.any(np.isnan(df1)))
+print(np.all(np.isfinite(df1)))
 
 y_CU = raw_df['Probability of Default']
 y = df1.label
@@ -143,40 +145,100 @@ plt.xticks(range(2), LABELS)
 plt.xlabel("Class")
 plt.ylabel("Frequency")
 plt.show()
+plt.savefig("Class distribution.pdf")
 
+print(df1['label'].value_counts())
 
 #from sklearn.cross_validation import train_test_split
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import confusion_matrix
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, auc, roc_curve
 
-
 X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=0)
 
+'''
+from imblearn.over_sampling import SMOTE
+os = SMOTE(random_state=0)
+#X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=0)
+columns = X_train.columns
+os_data_X,os_data_y=os.fit_sample(X_train, y_train)
+os_data_X = pd.DataFrame(data=os_data_X,columns=columns )
+os_data_y= pd.DataFrame(data=os_data_y,columns=['y'])
+# we can Check the numbers of our data
+print("length of X data is ",len(X))
+print("length of oversampled data is ",len(os_data_X))
+print("Number of no delinguent in oversampled data",len(os_data_y[os_data_y['y']==0]))
+print("Number of delinguent",len(os_data_y[os_data_y['y']==1]))
+print("Proportion of no delinguent data in oversampled data is ",len(os_data_y[os_data_y['y']==0])/len(os_data_X))
+print("Proportion of delinguent data in oversampled data is ",len(os_data_y[os_data_y['y']==1])/len(os_data_X))
+'''
 
 from sklearn.linear_model import LogisticRegression
-lr = LogisticRegression()
-lr = lr.fit(X_train, y_train)
 
+fig = plt.figure(figsize=(15,8))
+ax1 = fig.add_subplot(1,2,1)
+ax1.set_xlim([-0.05,1.05])
+ax1.set_ylim([-0.05,1.05])
+ax1.set_xlabel('Recall')
+ax1.set_ylabel('Precision')
+ax1.set_title('PR Curve')
+
+ax2 = fig.add_subplot(1,2,2)
+ax2.set_xlim([-0.05,1.05])
+ax2.set_ylim([-0.05,1.05])
+ax2.set_xlabel('False Positive Rate')
+ax2.set_ylabel('True Positive Rate')
+ax2.set_title('ROC Curve')
+
+for w,k in zip([1,5,10,20,50,100,10000],'bgrcmykw'):
+    lr_model = LogisticRegression(class_weight={0:1,1:w})
+    lr_model.fit(X_train,y_train)
+    #lr_model.fit(os_data_X,os_data_y)
+    pred_prob = lr_model.predict_proba(X_test)[:,1]
+
+    p,r,_ = precision_recall_curve(y_test,pred_prob)
+    tpr,fpr,_ = roc_curve(y_test,pred_prob)
+    
+    ax1.plot(r,p,c=k,label=w)
+    ax2.plot(tpr,fpr,c=k,label=w)
+ax1.legend(loc='lower left')    
+ax2.legend(loc='lower left')
+plt.show()
+plt.savefig("log_reg_weights.pdf")
+
+
+#lr = LogisticRegression(class_weight='balanced')
+lr = LogisticRegression(class_weight={0:1,1:28})
+lr = lr.fit(X_train, y_train)
 params = np.append(lr.intercept_,lr.coef_)
-print(params)
+#params = np.append(lr.coef_)
+#print(params)
+
+var1 = np.append("Intercept",X.columns)
+print(var1)
+
+#coeff1 = pd.DataFrame({'Variable':var1,'Coeffient':params})
+coeff1 = pd.DataFrame({'Coeffient':params, 'Variable':var1})
+print(coeff1.shape)
+print(coeff1.head(16))
+coeff1.to_csv("Model_Coefficients.csv")
+
+
 lr_predicted = lr.predict(X_test)
 confusion = confusion_matrix(y_test, lr_predicted)
 print(lr.score(X_test,y_test))
 print("Number of mislabeled points out of a total %d points : %d" % (X_test.shape[0],(y_test != lr_predicted).sum()))
 
-
 print("\n\n")
 
 print(confusion)
-
 y_pred = lr.predict(X_test)
 acc = accuracy_score(y_test,y_pred)
 prec = precision_score(y_test,y_pred)
 rec = recall_score(y_test,y_pred)
 f1 = f1_score(y_test, y_pred)
 fpr, tpr, thresholds = roc_curve(y_test, y_pred)
-auc = auc(fpr,tpr)
+auc1 = auc(fpr,tpr)
 
 print("\n\n")
 
@@ -188,28 +250,32 @@ print("Logistic accuracy:" ,acc)
 print("Logistic precision:" ,prec)
 print("Logistic recall:" ,rec)
 print("Logistic f1 ratio:" ,f1)
-print("Logistic AUC:" ,auc)
+print("Logistic AUC:" ,auc1)
 
 #y_proba_lr = lr.fit(X_train, y_train).predict_proba(X_test)
 y_proba_lr = lr.fit(X_train, y_train).predict_proba(X)
 print(y_proba_lr[:,1])
-#print(y_CU - y_proba_lr[:,1])
-#print(y_CU)
-
-#y_proba_list = list(zip(y_test[0:20], y_proba_lr[0:20,1]))
-# show the probability of positive class for first 20 instances
-#print(y_proba_list)
-
 
 from sklearn.model_selection import cross_val_score
 
 # accuracy is the default scoring metric
-print('Cross-validation (accuracy)', cross_val_score(lr, X, y, cv=5))
+print('Cross-validation (accuracy)', cross_val_score(lr, X_train, y_train, cv=5))
+scores_acc = cross_val_score(lr, X_train, y_train, cv=5)
+print("Accuracy: %0.2f (+/- %0.2f)" % (scores_acc.mean(), scores_acc.std() * 2))
+
 # use AUC as scoring metric
-print('Cross-validation (AUC)', cross_val_score(lr, X, y, cv=5, scoring = 'roc_auc'))
+print('Cross-validation (AUC)', cross_val_score(lr, X_train, y_train, cv=5, scoring = 'roc_auc'))
+scores_auc = cross_val_score(lr, X_train, y_train, cv=5, scoring = 'roc_auc')
+print("AUC: %0.2f (+/- %0.2f)" % (scores_auc.mean(), scores_auc.std() * 2))
+
 # use recall as scoring metric
-print('Cross-validation (recall)', cross_val_score(lr, X, y, cv=5, scoring = 'recall'))
-print('Cross-validation (precision)', cross_val_score(lr, X, y, cv=5, scoring = 'precision'))
+print('Cross-validation (recall)', cross_val_score(lr, X_train, y_train, cv=5, scoring = 'recall'))
+scores_rec = cross_val_score(lr, X_train, y_train, cv=5, scoring = 'recall')
+print("Recall: %0.2f (+/- %0.2f)" % (scores_rec.mean(), scores_rec.std() * 2))
+
+print('Cross-validation (precision)', cross_val_score(lr, X_train, y_train, cv=5, scoring = 'precision'))
+scores_prec = cross_val_score(lr, X_train, y_train, cv=5, scoring = 'precision')
+print("precision: %0.2f (+/- %0.2f)" % (scores_prec.mean(), scores_prec.std() * 2))
 
 
 import seaborn as sns   
@@ -223,9 +289,9 @@ sns.heatmap(cm, annot=True, ax = ax); #annot=True to annotate cells
 # labels, title and ticks
 ax.set_xlabel('Predicted labels');ax.set_ylabel('True labels'); 
 ax.set_title('Confusion Matrix'); 
-ax.xaxis.set_ticklabels(['non-deli', 'deli']); ax.yaxis.set_ticklabels(['non-deli', 'deli'])
+ax.xaxis.set_ticklabels(['non-delinguent', 'delinguent']); ax.yaxis.set_ticklabels(['non-delinguent', 'delinguent'])
 plt.show()
-
+plt.savefig("confusion_matrix.pdf")
 
 y_scores_lr = lr.decision_function(X_test)
 
@@ -251,7 +317,7 @@ plt.show()
 
 
 fpr_lr, tpr_lr, _ = roc_curve(y_test, y_scores_lr)
-roc_auc_lr = 72 #auc(fpr_lr, tpr_lr)
+roc_auc_lr = auc1 #auc(fpr_lr, tpr_lr)
 
 fig1 = plt.figure()
 plt.xlim([-0.01, 1.00])
@@ -272,6 +338,28 @@ err = y_CU - y_proba_lr[:,1]
 rmse_err = np.sqrt(np.mean(err**2))
 print(rmse_err)
 
+prob = y_proba_lr[:,1]
+prob2 = pd.DataFrame({'probability':prob})
+print(prob2.shape)
+print(prob2.head(6))
+prob2.to_csv("predicted_probability.csv")
+
+
+save_classifier = open("log_reg_Credit_Union_PDS_model.pickle", "wb")
+pickle.dump(lr, save_classifier)
+#cPickle.dump(model, save_classifier)
+##dill.dump(model, save_classifier)
+save_classifier.close()
+print("hoora!")
+
+'''
+classifier_f = open("log_reg_Credit_Union_PDS_model.pickle","rb")
+model = pickle.load(classifier_f)
+classifier_f.close()
+'''
+
+
+'''
 
 #https://scikit-learn.org/stable/auto_examples/model_selection/plot_roc.html#sphx-glr-auto-examples-model-selection-plot-roc-py
 
@@ -299,7 +387,7 @@ y_score = lr.fit(X_train, y_train).decision_function(X_test)
 # Compute ROC curve and ROC area for each class
 
 fpr, tpr, _ = roc_curve(y_test, y_score)
-roc_auc = 72 #auc(fpr, tpr)
+roc_auc = auc1 #auc(fpr, tpr)
 
 fig =plt.figure()
 lw = 2
@@ -315,7 +403,7 @@ plt.legend(loc="lower right")
 plt.show()
 fig.savefig("ROC_curve_2.pdf")
 
-
+'''
 
 
 
