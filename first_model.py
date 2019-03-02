@@ -158,7 +158,8 @@ from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_sc
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=0)
 
-'''
+
+
 from imblearn.over_sampling import SMOTE
 os = SMOTE(random_state=0)
 #X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=0)
@@ -173,7 +174,10 @@ print("Number of no delinguent in oversampled data",len(os_data_y[os_data_y['y']
 print("Number of delinguent",len(os_data_y[os_data_y['y']==1]))
 print("Proportion of no delinguent data in oversampled data is ",len(os_data_y[os_data_y['y']==0])/len(os_data_X))
 print("Proportion of delinguent data in oversampled data is ",len(os_data_y[os_data_y['y']==1])/len(os_data_X))
-'''
+X_train = os_data_X
+y_train = os_data_y
+
+
 
 from sklearn.linear_model import LogisticRegression
 
@@ -210,7 +214,8 @@ fig12.savefig("log_reg_weights.pdf")
 #fig12.savefig("log_reg_weights.png")
 
 #lr = LogisticRegression(class_weight='balanced')
-lr = LogisticRegression(class_weight={0:1,1:28})
+#lr = LogisticRegression(class_weight={0:1,1:28})
+lr = LogisticRegression()
 lr = lr.fit(X_train, y_train)
 params = np.append(lr.intercept_,lr.coef_)
 #params = np.append(lr.coef_)
@@ -224,7 +229,6 @@ coeff1 = pd.DataFrame({'Coeffient':params, 'Variable':var1})
 print(coeff1.shape)
 print(coeff1.head(16))
 coeff1.to_csv("Model_Coefficients.csv")
-
 
 lr_predicted = lr.predict(X_test)
 confusion = confusion_matrix(y_test, lr_predicted)
@@ -279,7 +283,6 @@ print('Cross-validation (precision)', cross_val_score(lr, X_train, y_train, cv=5
 scores_prec = cross_val_score(lr, X_train, y_train, cv=5, scoring = 'precision')
 print("precision: %0.2f (+/- %0.2f)" % (scores_prec.mean(), scores_prec.std() * 2))
 
-
 import seaborn as sns   
 
 #cm = pd.crosstab(y_test, y_pred, rownames = 'True', colnames = 'predicted', margins = False)
@@ -317,10 +320,8 @@ plt.ylabel('Recall', fontsize=16)
 plt.axes().set_aspect('equal')
 plt.show()
 
-
-
 fpr_lr, tpr_lr, _ = roc_curve(y_test, y_scores_lr)
-roc_auc_lr = auc1 #auc(fpr_lr, tpr_lr)
+roc_auc_lr = auc(fpr_lr, tpr_lr)
 
 fig13 = plt.figure()
 plt.xlim([-0.01, 1.00])
@@ -336,7 +337,6 @@ plt.show()
 fig13.savefig("ROC_curve_1.pdf")
 #fig1.savefig("ROC_curve_1.png")
 
-
 print(y_proba_lr[:,1])
 err = y_CU - y_proba_lr[:,1]
 rmse_err = np.sqrt(np.mean(err**2))
@@ -348,7 +348,6 @@ print(prob2.shape)
 print(prob2.head(6))
 prob2.to_csv("predicted_probability.csv")
 
-
 save_classifier = open("log_reg_Credit_Union_PDS_model.pickle", "wb")
 pickle.dump(lr, save_classifier)
 #cPickle.dump(model, save_classifier)
@@ -356,40 +355,22 @@ pickle.dump(lr, save_classifier)
 save_classifier.close()
 print("hoora!")
 
-'''
-classifier_f = open("log_reg_Credit_Union_PDS_model.pickle","rb")
-model = pickle.load(classifier_f)
-classifier_f.close()
-'''
-
+#classifier_f = open("log_reg_Credit_Union_PDS_model.pickle","rb")
+#model = pickle.load(classifier_f)
+#classifier_f.close()
 
 #https://scikit-learn.org/stable/auto_examples/model_selection/plot_roc.html#sphx-glr-auto-examples-model-selection-plot-roc-py
 
+#https://towardsdatascience.com/building-a-logistic-regression-in-python-step-by-step-becd4d56c9c8
 
-from sklearn.preprocessing import label_binarize
-from sklearn.multiclass import OneVsRestClassifier
-from sklearn import svm
-# Binarize the output
-y_2 = y #label_binarize(y, classes=[0, 1])
-print(y_2.shape)
-n_classes = 1 # y_2.shape[1]
+#https://github.com/susanli2016/Machine-Learning-with-Python/blob/master/Logistic%20Regression%20balanced.ipynb
 
-random_state = np.random.RandomState(0)
-
-# shuffle and split training and test sets
-X_train, X_test, y_train, y_test = train_test_split(X, y_2, test_size=.25, random_state=0)
-
-# Learn to predict each class against the other
-#classifier = OneVsRestClassifier(svm.SVC(kernel='linear', probability=True, random_state=random_state))
-#y_score = classifier.fit(X_train, y_train).decision_function(X_test)
-#lr = LogisticRegression()
-#y_score = lr.fit(X_train, y_train).decision_function(X_test)
 y_score = lr.decision_function(X_test)
 
 # Compute ROC curve and ROC area for each class
 
 fpr, tpr, _ = roc_curve(y_test, y_score)
-roc_auc = auc1 #auc(fpr, tpr)
+roc_auc = auc(fpr, tpr)
 
 fig14 =plt.figure()
 lw = 2
@@ -407,9 +388,15 @@ fig14.savefig("ROC_curve_2.pdf")
 #fig.savefig("ROC_curve_2.png")
 
 
+#++++++++++++++++++++++++++++++++++++++++ LGD +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+# Load modules and data
+import statsmodels.api as sm
 
-
+# Instantiate a gamma family model with the default link function.
+gamma_model = sm.GLM(y_train, X_train, family=sm.families.Gamma())
+gamma_results = gamma_model.fit()
+print(gamma_results.summary())
 
 
 
